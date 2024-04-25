@@ -8,6 +8,8 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/webnativeorg/tinycloud-server/cmd/environment"
+	"github.com/webnativeorg/tinycloud-server/cmd/share"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 func ValidateJWT() gin.HandlerFunc {
@@ -27,15 +29,20 @@ func ValidateJWT() gin.HandlerFunc {
 			}
 			return []byte(environment.JWT_SECRET), nil
 		})
-
 		if err != nil {
-			c.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
+			fmt.Println("Error parsing token", err)
+			c.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
 			c.Abort()
 			return
 		}
-
 		if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
-			c.Set("email", claims["email"])
+			id, _ := primitive.ObjectIDFromHex(claims["id"].(string))
+			c.Set("user", share.UserContext{
+				Email:   claims["email"].(string),
+				Id:      id,
+				Name:    claims["name"].(string),
+				IsAdmin: claims["is_admin"].(bool),
+			})
 		} else {
 			c.JSON(http.StatusUnauthorized, gin.H{"message": "unauthorized"})
 			c.Abort()
