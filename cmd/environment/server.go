@@ -8,3 +8,4 @@ import (
 var PORT string = os.Getenv("PORT")
 var JWT_SECRET string = os.Getenv("JWT_SECRET")
 var JWT_EXPIRATION, _ = strconv.Atoi(os.Getenv("JWT_EXPIRATION"))
+var DATA_DIR string = os.Getenv("DATA_DIR")

@@ -6,6 +6,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/webnativeorg/tinycloud-server/cmd/environment"
+	"github.com/webnativeorg/tinycloud-server/cmd/handlers"
 	"github.com/webnativeorg/tinycloud-server/cmd/middlewares"
 	"github.com/webnativeorg/tinycloud-server/cmd/services"
 )
@@ -23,6 +24,9 @@ func main() {
 	authorized.Use(middlewares.ValidateJWT())
 	{
 		authorized.GET("/users", services.GetUsers)
+
+		// File routes
+		authorized.POST("/files/upload", handlers.UploadFilesHandler)
 	}
 
 	r.Run(":" + environment.PORT)
